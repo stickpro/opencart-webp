@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+  <name>WebP</name>
+  <code>WebP</code>
+  <version>1.1.0</version>
+  <author>stickpro</author>
+  <link>https://stick-design.ru</link>
+  <file path="catalog/model/tool/image.php">
+    <operation>
+      <search><![CDATA[$image_new = 'cache/']]></search>
+      <add position="after" offset="1"><![CDATA[ $image_new_webp = 'cachewebp/' . utf8_substr($filename, 0, utf8_strrpos($filename, '.')) . '-' . (int)$width . 'x' . (int)$height . '.webp'; ]]></add>
+    </operation>
+    
+    <operation>
+      <search><![CDATA[ $imagepath_parts = explode('/', $image_new); ]]></search>
+      <add position="before" ><![CDATA[ if (!is_file(DIR_IMAGE . $image_new_webp) || (filectime(DIR_IMAGE . $image_new) > filectime(DIR_IMAGE . $image_new_webp))) {
+
+			$path = '';
+
+			$directories = explode('/', dirname($image_new_webp));
+
+			foreach ($directories as $directory) {
+				$path = $path . '/' . $directory;
+
+				if (!is_dir(DIR_IMAGE . $path)) {
+					@mkdir(DIR_IMAGE . $path, 0777);
+				}
+			}
+			
+	
+			$command = "cwebp -q 100 '" . DIR_IMAGE . $image_new . "' -o '". DIR_IMAGE . $image_new_webp . "'";
+	
+			
+			exec($command);
+
+		} ]]></add>
+    </operation>
+    
+  </file>
+  <file path="system/library/response.php">
+       <operation>
+            <search><![CDATA[ private function compress($data, $level = 0) ]]></search>
+            <add position="before" ><![CDATA[ 	
+              public function webpRebuild($output) {
+              $uri = '';
+
+              if (isset($_SERVER['REQUEST_URI'])) {
+                $uri = $_SERVER['REQUEST_URI'];
+              }
+              
+              if (stripos($uri, 'admin') === false) {
+	             	if (isset($_SERVER['HTTP_ACCEPT']) && isset($_SERVER['HTTP_USER_AGENT'])) {
+	             		if( strpos( $_SERVER['HTTP_ACCEPT'], 'image/webp' ) !== false ) {	
+	             			$re = '/(cache)(.*)(\.jpg\"|\.png\"|\.JPG\"|\.PNG\"|\.jpeg\"|\.JPEG\")/U';
+	             			$subst = '$1webp$2.webp';
+	             			$this->output = preg_replace($re, $subst, $this->output);
+	             		}
+	             	}
+	            } 
+            }
+  ]]></add>
+       </operation>
+       <operation>
+            <search><![CDATA[ $output = $this ]]></search>
+            <add position="before" ><![CDATA[ $this->webpRebuild($this->output); ]]></add>
+       </operation>
+  </file>
+</modification>
