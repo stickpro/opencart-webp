@@ -13,7 +13,8 @@
     
     <operation>
       <search><![CDATA[ $imagepath_parts = explode('/', $image_new); ]]></search>
-      <add position="before" ><![CDATA[ if (!is_file(DIR_IMAGE . $image_new_webp) || (filectime(DIR_IMAGE . $image_new) > filectime(DIR_IMAGE . $image_new_webp))) {
+      <add position="before" ><![CDATA[ 
+      if (!is_file(DIR_IMAGE . $image_new_webp) || (filectime(DIR_IMAGE . $image_new) > filectime(DIR_IMAGE . $image_new_webp))) {
 
 			$path = '';
 

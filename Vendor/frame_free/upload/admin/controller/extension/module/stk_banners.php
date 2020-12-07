@@ -2,7 +2,8 @@
 class ControllerExtensionModuleSTKBanners extends Controller {
 	private $error = array();
 
-	public function index() {
+	public function index() 
+	{
 		$this->load->language('extension/module/stk_banners');
 
 		$this->load->model('localisation/language');
